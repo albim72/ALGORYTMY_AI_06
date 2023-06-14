@@ -36,3 +36,38 @@ toolbox.register("expr",gp.genHalfAndHalf,pset=pset,min_=-1,max_=2)
 toolbox.register("individual",tools.initIterate, creator.Individual,toolbox.expr)
 toolbox.register("population",tools.initRepeat,list,toolbox.individual)
 toolbox.register("compile",gp.compile, pset=pset)
+
+def evalSymbReg(individual,points):
+    func = toolbox.compile(expr=individual)
+    sqerrors = ((func(x) - x**4 - x**3 - x**2 - x)**2 for x in points)
+    return math.fsum(sqerrors)/len(points)
+
+
+toolbox.register("evaluate",evalSymbReg,points=[x/10. for x in range(-10,10)])
+toolbox.register("select",tools.selTournament, tournsize=3)
+toolbox.register("mate",gp.cxOnePoint)
+toolbox.register("expr_mut",gp.genFull,min_=0,max_=2)
+toolbox.register("mutate",gp.mutUniform,expr=toolbox.expr_mut,pset=pset)
+
+toolbox.decorate("mate",gp.staticLimit(key=operator.attrgetter("height"),max_value=17))
+toolbox.decorate("mutate",gp.staticLimit(key=operator.attrgetter("height"),max_value=17))
+
+def main():
+    random.seed(318)
+
+    pop = toolbox.population(n=300)
+    hof = tools.HallOfFame(1)
+
+    stats_fit = tools.Statistics(lambda ind:ind.fitness.values)
+    stats_size = tools.Statistics(len)
+    mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+    mstats.register("avg",numpy.mean)
+    mstats.register("std",numpy.std)
+    mstats.register("min",numpy.min)
+    mstats.register("max",numpy.max)
+
+    pop, log = algorithms.eaSimple(pop,toolbox,0.5,0.1,40,stats=mstats,halloffame=hof,verbose=True)
+    return pop,log,hof
+
+if __name__ == '__main__':
+    main()
