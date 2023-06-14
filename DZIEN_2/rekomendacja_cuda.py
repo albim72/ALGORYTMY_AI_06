@@ -47,7 +47,7 @@ model = movie_embedding_model()
 model.summary()
 
 random.seed(5)
-
+@jit(target_backend='cuda', forceobj=True)
 def batchfier(pairs,positive_samples=50,negative_ratio=10):
     batch_size = positive_samples*(1+negative_ratio)
     batch = np.zeros((batch_size,3))
