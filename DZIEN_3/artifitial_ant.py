@@ -98,3 +98,28 @@ class AntSimulator(object):
         self.matrix_exc = copy.deepcopy(self.matrix)
 
 ant = AntSimulator(600)
+
+pset = gp.PrimitiveSet("MAIN",0)
+pset.addPrimitive(ant.if_food_ahead,2)
+pset.addPrimitive(prog2,2)
+pset.addPrimitive(prog3,3)
+pset.addTerminal(ant.move_forward)
+pset.addTerminal(ant.turn_left)
+pset.addTerminal(ant.turn_right)
+
+
+creator.create("FitnessMax",base.Fitness,weights=(1.0,))
+creator.create("Individual",gp.PrimitiveTree,fitness=creator.FitnessMax)
+
+toolbox = base.Toolbox()
+
+toolbox.register("expr_init",gp.genFull,pset=pset,min_=1,max_=2)
+
+toolbox.register("individual",tools.initIterate,creator.Individual,toolbox.expr_init)
+
+def evalArtifitialAnt(individual):
+    routine = gp.compile(individual,pset)
+    ant.run(routine)
+    return ant.eaten
+
+
