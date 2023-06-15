@@ -51,12 +51,12 @@ class AntSimulator(object):
         if self.moves < self.max_moves:
             self.moves += 1
             self.dir = (self.dir-1)%4
-            
+
     def turn_right(self):
         if self.moves < self.max_moves:
             self.moves += 1
             self.dir = (self.dir+1)%4
-            
+
     def move_forward(self):
         if self.moves < self.max_moves:
             self.moves += 1
@@ -65,16 +65,36 @@ class AntSimulator(object):
             if self.matrix_exc[self.row][self.col] == "food":
                 self.eaten += 1
             self.matrix_exc[self.row][self.col]="passed"
-            
+
     def sense_food(self):
         ahead_row = (self.row + self.dir_row[self.dir]) % self.matrix_row
         ahead_col = (self.col + self.dir_col[self.dir]) % self.matrix_col
         return self.matrix_exc[ahead_row][ahead_col] == "food"
-    
+
     def if_food_ahead(self,out1,out2):
         return partial(if_then_else,self.sense_food,out1,out2)
-    
+
     def run(self,routine):
         self._reset()
         while self.moves < self.max_moves:
             routine()
+
+    def parse_matrix(self,matrix):
+        self.matrix = list()
+        for i, line in enumerate(matrix):
+            self.matrix.append(list())
+            for j, col in enumerate(line):
+                if col == "#":
+                    self.matrix[-1].append("food")
+                elif col == ".":
+                    self.matrix[-1].append("empty")
+                elif col == "S":
+                    self.matrix[-1].append("empty")
+                    self.row_start = self.row = i
+                    self.col_start = self.col = j
+                    self.dir = 1
+        self.matrix_row = len(self.matrix)
+        self.matrix_col = len(self.matrix[0])
+        self.matrix_exc = copy.deepcopy(self.matrix)
+
+ant = AntSimulator(600)
