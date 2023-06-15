@@ -116,10 +116,34 @@ toolbox = base.Toolbox()
 toolbox.register("expr_init",gp.genFull,pset=pset,min_=1,max_=2)
 
 toolbox.register("individual",tools.initIterate,creator.Individual,toolbox.expr_init)
-
+toolbox.register("population",tools.initRepeat,list,toolbox.individual)
 def evalArtifitialAnt(individual):
     routine = gp.compile(individual,pset)
     ant.run(routine)
     return ant.eaten
 
+toolbox.register("evaluate",evalArtifitialAnt)
+toolbox.register("select",tools.selTournament,tournsize=7)
+toolbox.register("mate",gp.cxOnePoint)
+toolbox.register("expr_mut",gp.genFull,min_=0,max_=2)
+toolbox.register("mutate",gp.mutUniform,expr=toolbox.expr_mut,pset=pset)
 
+def main():
+    random.seed(69)
+
+    with open("santafe_trail.txt") as trail_file:
+        ant.parse_matrix(trail_file)
+
+    pop = toolbox.population(n=300)
+    hof = tools.HallOfFame(1)
+    stats = tools.Statistics(lambda ind:ind.fitness.values)
+    stats.register("średnia arytmetyczna:",numpy.mean)
+    stats.register("średnie odchylenie standardowe:",numpy.std)
+    stats.register("minium:",numpy.min)
+    stats.register("maximum:", numpy.max)
+
+    algorithms.eaSimple(pop,toolbox,0.5,0.2,40,stats,halloffame=hof)
+    return pop,hof,stats
+
+if __name__ == '__main__':
+    main()
