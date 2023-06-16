@@ -128,7 +128,7 @@ class QWorld:
     def act(self):
         """
         określenie następnej akcji: albo z tabeli Q(eksploatacja) albo wybór losowy
-        :return: 
+        :return:
             action(tensor): akcja którą musi wykonać agent
         """
 
@@ -137,9 +137,24 @@ class QWorld:
             #eksploruj - wykonaj losową akcję
             self.is_explore = True
             return np.random.choice(4,1)[0]
-        
+
         #lub eksploatacja  - wybór akcji z maksymalną wartością Q
         self.is_explore = False
         action = np.argmax(self.q_table[self.state])
         return action
 
+    def update_q_table(self,state,action,reward,next_state):
+        """
+        Q-uczenie aktualizacja tabeli Q przy użyciu Q(s,a)
+        :param state(tensor): stan agent
+        :param action(tensor): akcja wykonywana przez agenta
+        :param reward(float): nagroda po wykonaniu akcji dla dane stanu
+        :param next_state(tensor): następny stan po wykonaniu akcji dla danego stanu
+        :return: 
+        """
+        
+        #Q(s,a) = nagroda + gamma*max_a' Q(s',a')
+        
+        q_value = self.gamma*np.amax(self.q_table[next_state])
+        q_value += reward
+        self.q_table[state,action] = q_value
