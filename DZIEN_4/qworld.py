@@ -150,11 +150,53 @@ class QWorld:
         :param action(tensor): akcja wykonywana przez agenta
         :param reward(float): nagroda po wykonaniu akcji dla dane stanu
         :param next_state(tensor): następny stan po wykonaniu akcji dla danego stanu
-        :return: 
+        :return:
         """
-        
+
         #Q(s,a) = nagroda + gamma*max_a' Q(s',a')
-        
+
         q_value = self.gamma*np.amax(self.q_table[next_state])
         q_value += reward
         self.q_table[state,action] = q_value
+        
+    def print_q_table(self):
+        print("Q-Table (Epsilon: %0.2f)" %self.epsilon)
+        print(self.q_table)
+        
+    def update_epsilon(self):
+        if self.epsilon > self.epsilon_min:
+            self.epsilon *= self.epsilon_decay
+            
+    def print_cell(self,row=0):
+        """Interfejs użytkownika do wyswietlania agenta poruszającego się po siatce"""
+        print("")
+        for i in range(13):
+            j = i-2
+            if j in [0,4,8]:
+                if j==8:
+                    if self.state==2 and row==0:
+                        marker = "\033[4mG\033[0m"
+                    elif self.state==5 and row==1:
+                        marker = "\033[4mH\033[0m"
+                    else:
+                        marker = 'G' if row == 0 else 'H'
+                    color = self.state == 2 and row==0
+                    color = color or (self.state == 5 and row==1)
+                    color = 'red' if color else 'blue'
+                    print(colored(marker,color), end='')
+                elif self.state in [0,1,3,4]:
+                    cell = [(0,0,0),(1,0,4),(3,1,0),(4,1,4)]
+                    marker = '_' if(self.state, row,j) in cell else ' '
+                    print(colored(marker,'red'),end='')
+                else:
+                    print(' ',end='')
+            elif i%4 == 0:
+                print("|",end='')
+            else:
+                print(' ',end='')
+        print("")
+        
+    
+                    
+            
+    
