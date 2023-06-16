@@ -228,11 +228,11 @@ def print_episode(episode, delay=1):
         print("-", end='')
     print("")
     time.sleep(delay)
-    
+
 def print_status(q_world,done,step,delay=1):
     """
     Interfejs użytkownika do wyświetlenia świata
-    
+
     """
     os.system('clear')
     q_world.print_world(action,step)
@@ -244,4 +244,53 @@ def print_status(q_world,done,step,delay=1):
 
 
 
-
+if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser()
+    help_ = "Uczenie i pokazanie końcowej tabeli Q"
+    parser.add_argument("-t",
+                        "--train",
+                        help=help_,
+                        action='store_true')
+    args = parser.parse_args()
+    
+    if args.train:
+        maxwins = 2000
+        delay = 0
+    else:
+        maxwins = 10
+        delay = 1
+        
+    wins = 0
+    episode_count = 10*maxwins
+    
+    #punktacja (maksymalna liczba kroków przed osiągnięciem celu)
+    scores = deque(maxlen=maxwins)
+    q_world = QWorld()
+    step = 1
+    #iteracja: stan, akcja, nagroda, następny stan
+    for episode in range(episode_count):
+        state = q_world.reset()
+        done = False
+        print_episode(episode,delay=delay)
+        while not done:
+            action = q_world.act()
+            next_state,reward,done = q_world.step(action)
+            q_world.update_q_table(state,action,reward,next_state)
+            print_status(q_world,done,step,delay=delay)
+            state = next_state
+            #jeśli epizod będzie zakończony zacznij od nowa
+            if done:
+                if q_world.is_in_win_state():
+                    wins += 1
+                    scores.append(step)
+                    if wins > maxwins:
+                        print(scores)
+                        exit(0)
+                #Eksploracja/Ekspolatacja aktualizowana po każdym epizodzie
+                q_world.update_epsilon()
+                step = 1
+            else:
+                step += 1
+    print(scores)
+    q_world.print_q_table()
