@@ -54,7 +54,7 @@ class QWorld:
         ___________________________
 
         """
-        self.reward_table = np.zeros([self.row],[self.col])
+        self.reward_table = np.zeros([self.row,self.col])
         self.reward_table[1,2] = 100.
         self.reward_table[4,2] = -100.
 
@@ -245,7 +245,7 @@ def print_status(q_world,done,step,delay=1):
 
 
 if __name__ == '__main__':
-    
+
     parser = argparse.ArgumentParser()
     help_ = "Uczenie i pokazanie końcowej tabeli Q"
     parser.add_argument("-t",
@@ -253,17 +253,17 @@ if __name__ == '__main__':
                         help=help_,
                         action='store_true')
     args = parser.parse_args()
-    
+
     if args.train:
         maxwins = 2000
         delay = 0
     else:
         maxwins = 10
         delay = 1
-        
+
     wins = 0
     episode_count = 10*maxwins
-    
+
     #punktacja (maksymalna liczba kroków przed osiągnięciem celu)
     scores = deque(maxlen=maxwins)
     q_world = QWorld()
