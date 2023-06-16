@@ -114,7 +114,7 @@ class QWorld:
         reward(float):nagroda dla agenta
         done(Bool):czy osiągnięto cel graniczny
         """
-        
+
         #definicja następnego stanu (next_state), mając dany stan i akcję
         next_state = self.transition_table[self.state,action]
         #done ma wartość True, jeśsli next_state to cel albo dziura
@@ -125,5 +125,21 @@ class QWorld:
         self.state = next_state
         return next_state,reward,done
 
+    def act(self):
+        """
+        określenie następnej akcji: albo z tabeli Q(eksploatacja) albo wybór losowy
+        :return: 
+            action(tensor): akcja którą musi wykonać agent
+        """
 
+        # 0 - lewo, 1 - dół, 2 - prawo, 3 - góra
+        if np.random.rand() <= self.epsilon:
+            #eksploruj - wykonaj losową akcję
+            self.is_explore = True
+            return np.random.choice(4,1)[0]
+        
+        #lub eksploatacja  - wybór akcji z maksymalną wartością Q
+        self.is_explore = False
+        action = np.argmax(self.q_table[self.state])
+        return action
 
