@@ -210,8 +210,24 @@ class QWorld:
         for _ in range(13):
             print("-",end='')
         print("")
-            
 
+def print_episode(episode, delay=1):
+    """
+    Interfejs użytkownia do wyświetlenia zlicznia epizodów
+    :param episode(int):numer epizodu 
+    :param delay(int):opóźnienie [sek] 
+    :return: 
+    """
+    
+    os.system('clear')
+    for _ in range(13):
+        print("-", end='')
+    print("")
+    print(f"Epizod: {episode}")
+    for _ in range(13):
+        print("-", end='')
+    print("")
+    time.sleep(delay)
 
 
 
