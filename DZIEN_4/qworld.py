@@ -158,15 +158,15 @@ class QWorld:
         q_value = self.gamma*np.amax(self.q_table[next_state])
         q_value += reward
         self.q_table[state,action] = q_value
-        
+
     def print_q_table(self):
         print("Q-Table (Epsilon: %0.2f)" %self.epsilon)
         print(self.q_table)
-        
+
     def update_epsilon(self):
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
-            
+
     def print_cell(self,row=0):
         """Interfejs użytkownika do wyswietlania agenta poruszającego się po siatce"""
         print("")
@@ -195,8 +195,24 @@ class QWorld:
             else:
                 print(' ',end='')
         print("")
-        
-    
-                    
+
+    def print_world(self,action,step):
+        """Interfejs użytkownika do wyświetlania trybu i akcji agenta"""
+        actions = {0:"(Lewo)",1:"(Dol)",2:"(Prawo)",3:"(Gora)"}
+        explore = "Eksploracja" if self.is_explore else "Eksploatacja"
+        print("Krok",step,":",explore,actions[action])
+        for _ in range(13):
+            print("-",end='')
+        self.print_cell()
+        for _ in range(13):
+            print("-",end='')
+        self.print_cell(row=1)
+        for _ in range(13):
+            print("-",end='')
+        print("")
             
-    
+
+
+
+
+
